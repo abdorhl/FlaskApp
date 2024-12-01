@@ -68,18 +68,17 @@ pipeline {
     }
     
     post {
-    always {
-        junit(
-            allowEmptyResults: true,
-            testResults: 'test-reports/*.xml'
-        )
-        publishHTML([
-            allowMissing: true,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: 'security-reports',
-            reportFiles: 'zap-report.html',
-            reportName: 'ZAP Security Report'
-        ])
+        always {
+            junit(
+                allowEmptyResults: true,
+                testResults: 'test-reports/*.xml'
+            )
+            
+            archiveArtifacts(
+                artifacts: 'security-reports/*',
+                allowEmptyArchive: true,
+                fingerprint: true
+            )
+        }
     }
-}}
+}

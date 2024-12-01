@@ -32,8 +32,8 @@ pipeline {
                     mkdir -p security-reports
                     bandit -r . -f json -o security-reports/bandit-report.json || true
                 '''
-            }
-        */}
+            }}
+        */
         
         stage('Run Tests') {
             steps {

@@ -49,8 +49,8 @@ pipeline {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                     sh '''
-                        sudo apt-get update
-                        sudo apt-get install -y sshpass
+                        sudo DEBIAN_FRONTEND=noninteractive apt-get update
+                        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sshpass
                         export ANSIBLE_HOST_KEY_CHECKING=False
                         ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
                     '''

@@ -13,7 +13,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 1800
 # Initialize Talisman
 talisman = Talisman(
     app,
-    force_https=True,
+    force_https=not app.config.get('TESTING', False),
     strict_transport_security=True,
     session_cookie_secure=True,
     content_security_policy={

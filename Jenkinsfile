@@ -48,7 +48,11 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml || true'
+                    sh '''
+                        sudo apt-get update
+                        sudo apt-get install -y sshpass
+                        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                    '''
                 }
             }
         }

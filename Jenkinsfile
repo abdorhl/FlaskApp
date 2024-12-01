@@ -48,7 +48,7 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                         sh '''
                             mkdir -p ~/.ssh
                             cp "$SSH_KEY" ~/.ssh/id_rsa

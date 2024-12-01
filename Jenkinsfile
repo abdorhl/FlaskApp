@@ -48,9 +48,15 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh '''
-                        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
-                    '''
+                    withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                        sh '''
+                            mkdir -p ~/.ssh
+                            cp "$SSH_KEY" ~/.ssh/id_rsa
+                            chmod 600 ~/.ssh/id_rsa
+                            ssh-keyscan -H 192.168.88.132 >> ~/.ssh/known_hosts
+                            ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                        '''
+                    }
                 }
             }
         }

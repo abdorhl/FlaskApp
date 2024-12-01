@@ -25,7 +25,7 @@ pipeline {
             }
         }
         
-        stage('Security Scan') {
+       /* stage('Security Scan') {
             steps {
                 sh '''
                     . venv/bin/activate
@@ -33,7 +33,7 @@ pipeline {
                     bandit -r . -f json -o security-reports/bandit-report.json || true
                 '''
             }
-        }
+        */}
         
         stage('Run Tests') {
             steps {

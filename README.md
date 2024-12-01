@@ -15,8 +15,8 @@ Ce projet implémente une application web Flask avec un pipeline CI/CD sécuris�
 
 1. Cloner le dépôt :
 ```bash
-git clone <votre-repo>
-cd <votre-repo>
+git clone https://github.com/abdorhl/FlaskApp.git
+cd FlaskApp
 ```
 
 2. Créer un environnement virtuel :

@@ -49,7 +49,7 @@ pipeline {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                     sh '''
-                        sudo apt-get update
+                        
                         sudo apt-get install -y sshpass
                         ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
                     '''

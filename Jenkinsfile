@@ -54,7 +54,7 @@ pipeline {
             steps {
                 sh '''
                     # Exécuter OWASP ZAP
-                    docker run -t owasp/zap2docker-stable zap-baseline.py -t http://your-app-url:5000
+                    docker run -t owasp/zap2docker-stable zap-baseline.py -t http://192.168.88.132:5000
                 '''
             }
         }

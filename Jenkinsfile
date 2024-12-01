@@ -48,15 +48,12 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
-                        sh '''
-                            mkdir -p ~/.ssh
-                            cp "$SSH_KEY" ~/.ssh/id_rsa
-                            chmod 600 ~/.ssh/id_rsa
-                            ssh-keyscan -H 192.168.88.132 >> ~/.ssh/known_hosts
-                            ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
-                        '''
-                    }
+                    sh '''
+                        sudo apt-get update
+                        sudo apt-get install -y sshpass
+                        export ANSIBLE_HOST_KEY_CHECKING=False
+                        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                    '''
                 }
             }
         }

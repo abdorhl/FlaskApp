@@ -29,9 +29,11 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
+                    mkdir -p security-reports
                     bandit -r . -f json -o security-reports/bandit-report.json || true
                 '''
-            }}
+            }
+        }
         
         stage('Run Tests') {
              steps {
@@ -45,10 +47,11 @@ pipeline {
         
         stage('Deploy with Ansible') {
             steps {
-                ansiblePlaybook(
-                    playbook: 'ansible/deploy.yml',
-                    inventory: 'ansible/inventory.ini'
-                )
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh '''
+                        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                    '''
+                }
             }
         }
         
@@ -56,7 +59,8 @@ pipeline {
             steps {
                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                 sh '''
-                    docker run -t owasp/zap2docker-stable zap-baseline.py -t http://192.168.88.132:5000 || true
+                    mkdir -p security-reports
+                    docker run -v $(pwd)/security-reports:/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t http://192.168.88.132:5000 -r security-reports/zap-report.html || true
                 '''
                }
             }
@@ -67,17 +71,15 @@ pipeline {
     always {
         junit(
             allowEmptyResults: true,
-            testResults: 'test-reports/*.xml',
-            skipPublishingChecks: true
+            testResults: 'test-reports/*.xml'
         )
-        publishHTML(target: [
+        publishHTML([
             allowMissing: true,
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: 'security-reports',
-            reportFiles: 'bandit-report.json',
-            reportName: 'Security Report',
-            reportTitles: 'Security Scan Results'
+            reportFiles: 'zap-report.html',
+            reportName: 'ZAP Security Report'
         ])
     }
 }}

@@ -47,14 +47,10 @@ pipeline {
         
         stage('Deploy with Ansible') {
             steps {
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh '''
-                        sudo DEBIAN_FRONTEND=noninteractive apt-get update
-                        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sshpass
-                        export ANSIBLE_HOST_KEY_CHECKING=False
-                        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
-                    '''
-                }
+                sh '''
+                    export ANSIBLE_HOST_KEY_CHECKING=False
+                    ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                '''
             }
         }
         

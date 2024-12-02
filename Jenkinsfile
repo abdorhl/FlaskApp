@@ -47,10 +47,7 @@ pipeline {
         
         stage('Deploy with Ansible') {
             steps {
-                sh '''
-                    export ANSIBLE_HOST_KEY_CHECKING=False
-                    ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
-                '''
+                sh 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
             }
         }
         

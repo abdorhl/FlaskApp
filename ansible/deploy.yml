@@ -57,12 +57,24 @@
         group: "{{ app_group }}"
         mode: '0755'
 
-    - name: Clone/update application repository
+    - name: Clean application directory
+      file:
+        path: "{{ app_directory }}"
+        state: absent
+
+    - name: Recreate application directory
+      file:
+        path: "{{ app_directory }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+
+    - name: Clone application repository
       git:
         repo: "{{ repo_url }}"
         dest: "{{ app_directory }}"
         version: main
-        force: yes
       become_user: "{{ app_user }}"
       
     - name: Setup Python virtual environment

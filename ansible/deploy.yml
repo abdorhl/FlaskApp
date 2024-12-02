@@ -40,13 +40,6 @@
         state: enabled
         policy: deny
 
-    - name: Create application user
-      user:
-        name: "{{ app_user }}"
-        system: yes
-        createhome: yes
-        home: "{{ app_directory }}"
-
     - name: Create application directory
       file:
         path: "{{ app_directory }}"
@@ -54,6 +47,13 @@
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: '0755'
+
+    - name: Copy application files
+      copy:
+        src: "{{ playbook_dir }}/../"
+        dest: "{{ app_directory }}/"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
 
     - name: Setup Python virtual environment
       command:
@@ -65,8 +65,30 @@
         requirements: "{{ app_directory }}/requirements.txt"
         virtualenv: "{{ venv_path }}"
 
+    - name: Kill existing Flask processes
+      shell: pkill -f "python -m flask run" || true
+      ignore_errors: yes
+
     - name: Start Flask application
       shell: |
         cd {{ app_directory }}
-        {{ venv_path }}/bin/python -m flask run --host=0.0.0.0 &
+        source {{ venv_path }}/bin/activate
+        nohup python -m flask run --host=0.0.0.0 > {{ app_directory }}/flask.log 2>&1 &
       become_user: "{{ app_user }}"
+
+    - name: Wait for application to start
+      wait_for:
+        port: 5000
+        timeout: 30
+
+    - name: Check application status
+      uri:
+        url: http://localhost:5000
+        return_content: yes
+      register: app_status
+      ignore_errors: yes
+
+    - name: Display application log if startup failed
+      command: cat {{ app_directory }}/flask.log
+      when: app_status.failed is defined
+      ignore_errors: yes

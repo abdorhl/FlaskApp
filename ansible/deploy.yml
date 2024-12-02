@@ -62,7 +62,16 @@
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: '0644'
-      
+        exclude:
+          - .git/
+          - .gitignore
+          - ansible/
+          - __pycache__/
+          - *.pyc
+          - test-reports/
+          - security-reports/
+          - venv/
+
     - name: Setup Python virtual environment
       pip:
         requirements: "{{ app_directory }}/requirements.txt"

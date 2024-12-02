@@ -1,0 +1,17 @@
+[Unit]
+Description=Flask Application Service
+After=network.target
+
+[Service]
+User=flask
+Group=flask
+WorkingDirectory=/opt/flask_app
+Environment="PATH=/opt/flask_app/venv/bin"
+Environment="FLASK_APP=app.py"
+Environment="FLASK_ENV=production"
+Environment="USE_SSL=false"
+ExecStart=/opt/flask_app/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -56,13 +56,6 @@
         group: "{{ app_group }}"
         mode: '0755'
 
-    - name: Copy application files
-      copy:
-        src: ../
-        dest: "{{ app_directory }}"
-        owner: "{{ app_user }}"
-        group: "{{ app_group }}"
-
     - name: Setup Python virtual environment
       command:
         cmd: python3 -m venv "{{ venv_path }}"

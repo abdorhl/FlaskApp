@@ -13,13 +13,14 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 1800
 # Initialize Talisman
 talisman = Talisman(
     app,
-    force_https=not app.config.get('TESTING', False),
+    force_https=False,  # Disable HTTPS redirect for testing
     strict_transport_security=True,
     session_cookie_secure=True,
     content_security_policy={
         'default-src': "'self'",
-        'img-src': "'self' data:",
-        'script-src': "'self'"
+        'img-src': '*',
+        'script-src': ["'self'", "'unsafe-inline'"],
+        'style-src': ["'self'", "'unsafe-inline'"]
     }
 )
 

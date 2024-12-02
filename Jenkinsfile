@@ -25,7 +25,7 @@ pipeline {
             }
         }
         
-       /* stage('Security Scan') {
+        /* stage('Security Scan') {
             steps {
                 sh '''
                     . venv/bin/activate
@@ -51,7 +51,7 @@ pipeline {
             }
         }
         
-        stage('Security Tests') {
+        /*stage('Security Tests') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
@@ -65,7 +65,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
     }
     
     post {

@@ -10,6 +10,7 @@
     app_directory: /opt/flask_app
     venv_path: "{{ app_directory }}/venv"
     repo_url: https://github.com/abdorhl/FlaskApp.git
+    temp_clone_dir: /tmp/flask_app_temp
 
   tasks:
     - name: Update apt cache
@@ -49,6 +50,22 @@
         createhome: no
         shell: /bin/false
 
+    - name: Remove existing application directory
+      file:
+        path: "{{ app_directory }}"
+        state: absent
+
+    - name: Remove temporary clone directory
+      file:
+        path: "{{ temp_clone_dir }}"
+        state: absent
+
+    - name: Clone repository to temporary location
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ temp_clone_dir }}"
+        version: main
+
     - name: Create application directory
       file:
         path: "{{ app_directory }}"
@@ -57,26 +74,21 @@
         group: "{{ app_group }}"
         mode: '0755'
 
-    - name: Clean application directory
-      file:
-        path: "{{ app_directory }}"
-        state: absent
+    - name: Sync repository files to application directory
+      synchronize:
+        src: "{{ temp_clone_dir }}/"
+        dest: "{{ app_directory }}"
+        delete: yes
+        recursive: yes
+      delegate_to: "{{ inventory_hostname }}"
 
-    - name: Recreate application directory
+    - name: Set application directory permissions
       file:
         path: "{{ app_directory }}"
-        state: directory
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        recurse: yes
 
-    - name: Clone application repository
-      git:
-        repo: "{{ repo_url }}"
-        dest: "{{ app_directory }}"
-        version: main
-      become_user: "{{ app_user }}"
-      
     - name: Setup Python virtual environment
       pip:
         requirements: "{{ app_directory }}/requirements.txt"
@@ -107,3 +119,8 @@
       until: health_check.status == 200
       retries: 12
       delay: 5
+
+    - name: Cleanup temporary directory
+      file:
+        path: "{{ temp_clone_dir }}"
+        state: absent

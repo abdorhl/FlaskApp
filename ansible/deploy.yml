@@ -9,6 +9,7 @@
     app_group: flask
     app_directory: /opt/flask_app
     venv_path: "{{ app_directory }}/venv"
+    repo_url: https://github.com/abdorhl/FlaskApp.git
 
   tasks:
     - name: Update apt cache
@@ -23,6 +24,7 @@
           - python3-pip
           - python3-venv
           - ufw
+          - git
         state: present
 
     - name: Configure firewall
@@ -55,23 +57,14 @@
         group: "{{ app_group }}"
         mode: '0755'
 
-    - name: Copy application files
-      copy:
-        src: ../
+    - name: Clone/update application repository
+      git:
+        repo: "{{ repo_url }}"
         dest: "{{ app_directory }}"
-        owner: "{{ app_user }}"
-        group: "{{ app_group }}"
-        mode: '0644'
-        exclude:
-          - '.git/'
-          - '.gitignore'
-          - 'ansible/'
-          - '__pycache__/'
-          - '*.pyc'
-          - 'test-reports/'
-          - 'security-reports/'
-          - 'venv/'
-
+        version: main
+        force: yes
+      become_user: "{{ app_user }}"
+      
     - name: Setup Python virtual environment
       pip:
         requirements: "{{ app_directory }}/requirements.txt"
